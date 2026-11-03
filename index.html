@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#111827">
+  <title>BisnisKu — Manajemen Produk</title>
+  <style>
+    :root {
+      --bg: #f4f6fb; --surface: #fff; --text: #172033; --muted: #758096;
+      --line: #e7eaf1; --primary: #5b5ce2; --primary-dark: #4849c8;
+      --green: #15966a; --red: #dc4c64; --shadow: 0 12px 35px rgba(27,39,74,.07);
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    .app { min-height: 100vh; }
+    .topbar { background: #111827; color: white; padding: 17px 20px; }
+    .topbar-inner { max-width: 1120px; margin: auto; display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+    .brand { display: flex; align-items: center; gap: 11px; font-weight: 800; font-size: 20px; letter-spacing: -.5px; }
+    .brand-mark { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 12px; background: linear-gradient(135deg,#7778ff,#4d4fd2); font-size: 19px; }
+    .top-note { color: #c4cad7; font-size: 12px; }
+    main { max-width: 1120px; margin: 0 auto; padding: 28px 20px 48px; }
+    .heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 22px; }
+    h1 { margin: 0 0 6px; font-size: clamp(25px,4vw,32px); letter-spacing: -1px; }
+    .subtitle { margin: 0; color: var(--muted); font-size: 14px; }
+    .btn { border: 0; border-radius: 11px; padding: 11px 15px; font-weight: 700; transition: .18s ease; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+    .btn-primary { color: white; background: var(--primary); box-shadow: 0 6px 14px rgba(91,92,226,.2); }
+    .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+    .btn-light { background: #f0f1ff; color: var(--primary); }
+    .btn-danger { background: #fff0f2; color: var(--red); }
+    .stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-bottom: 22px; }
+    .stat { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow); }
+    .stat-top { display: flex; align-items: center; justify-content: space-between; color: var(--muted); font-size: 13px; }
+    .stat-icon { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 10px; background: #f0f1ff; color: var(--primary); font-size: 17px; }
+    .stat-value { margin-top: 12px; font-size: clamp(21px,3vw,27px); font-weight: 800; letter-spacing: -.7px; overflow-wrap: anywhere; }
+    .stat-foot { margin-top: 4px; color: var(--muted); font-size: 12px; }
+    .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+    .panel-head { padding: 19px 20px; display: flex; align-items: center; justify-content: space-between; gap: 15px; border-bottom: 1px solid var(--line); }
+    .panel-head h2 { margin: 0; font-size: 17px; }
+    .search-wrap { position: relative; width: min(100%,310px); }
+    .search-wrap span { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: #929bad; }
+    .search { width: 100%; border: 1px solid var(--line); background: #fafbfe; border-radius: 10px; padding: 10px 12px 10px 38px; outline: none; color: var(--text); }
+    .search:focus, .field input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(91,92,226,.1); }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 610px; }
+    th, td { padding: 14px 20px; text-align: left; border-bottom: 1px solid #f0f1f5; font-size: 13px; }
+    th { color: var(--muted); font-weight: 700; background: #fcfcfe; font-size: 11px; text-transform: uppercase; letter-spacing: .6px; }
+    tbody tr:last-child td { border-bottom: 0; }
+    .product-name { font-weight: 750; font-size: 14px; }
+    .product-category { color: var(--muted); font-size: 11px; margin-top: 4px; }
+    .price { font-weight: 700; white-space: nowrap; }
+    .stock { display: inline-block; padding: 5px 9px; border-radius: 20px; background: #eaf8f2; color: var(--green); font-size: 11px; font-weight: 750; }
+    .stock.low { background: #fff4e5; color: #b66b0b; }
+    .stock.empty { background: #fff0f2; color: var(--red); }
+    .actions { display: flex; gap: 7px; }
+    .icon-btn { width: 33px; height: 33px; border: 1px solid var(--line); border-radius: 9px; background: white; color: #596277; font-size: 14px; }
+    .icon-btn:hover { background: #f4f5ff; color: var(--primary); }
+    .icon-btn.delete:hover { background: #fff0f2; color: var(--red); }
+    .empty { padding: 48px 18px; text-align: center; color: var(--muted); }
+    .empty-icon { font-size: 34px; margin-bottom: 10px; }
+    .empty strong { display: block; color: var(--text); margin-bottom: 5px; }
+    .footer-note { color: var(--muted); text-align: center; font-size: 12px; margin-top: 18px; }
+    .modal-backdrop { position: fixed; inset: 0; z-index: 5; background: rgba(12,18,33,.55); display: none; align-items: center; justify-content: center; padding: 16px; }
+    .modal-backdrop.show { display: flex; }
+    .modal { background: white; width: min(100%,470px); border-radius: 20px; padding: 23px; box-shadow: 0 25px 70px rgba(0,0,0,.2); max-height: 92vh; overflow-y: auto; }
+    .modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+    .modal-head h2 { margin: 0; font-size: 20px; }
+    .close-btn { border: 0; background: #f2f3f7; border-radius: 9px; width: 34px; height: 34px; font-size: 19px; color: #596277; }
+    .field { margin-bottom: 14px; }
+    .field label { display: block; margin-bottom: 7px; font-size: 13px; font-weight: 700; }
+    .field input { width: 100%; border: 1px solid var(--line); border-radius: 10px; padding: 12px; outline: none; }
+    .field small { display: block; color: var(--muted); font-size: 11px; margin-top: 5px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .modal-actions { display: flex; gap: 9px; justify-content: flex-end; margin-top: 20px; }
+    .toast { position: fixed; z-index: 8; left: 50%; bottom: 22px; transform: translate(-50%,20px); opacity: 0; pointer-events: none; padding: 12px 17px; border-radius: 12px; background: #172033; color: white; font-size: 13px; box-shadow: var(--shadow); transition: .2s; max-width: calc(100% - 30px); text-align: center; }
+    .toast.show { opacity: 1; transform: translate(-50%,0); }
+    @media (max-width: 650px) {
+      .topbar { padding: 14px 16px; } main { padding: 23px 14px 35px; }
+      .heading { align-items: flex-start; flex-direction: column; }
+      .heading .btn { width: 100%; }
+      .stats { grid-template-columns: 1fr 1fr; gap: 10px; }
+      .stat:last-child { grid-column: 1 / -1; }
+      .stat { padding: 15px; }
+      .panel-head { align-items: stretch; flex-direction: column; padding: 16px; }
+      .search-wrap { width: 100%; }
+      .form-grid { grid-template-columns: 1fr; gap: 0; }
+      .modal { padding: 19px; }
+      .top-note { display: none; }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand"><div class="brand-mark">B</div><span>BisnisKu</span></div>
+      <div class="top-note">Kelola produk bisnis lebih mudah</div>
+    </div>
+  </header>
+
+  <main>
+    <section class="heading">
+      <div>
+        <h1>Dashboard Produk</h1>
+        <p class="subtitle">Pantau produk, harga, dan persediaan bisnismu.</p>
+      </div>
+      <button class="btn btn-primary" id="addBtn" type="button"><span>＋</span> Tambah Produk</button>
+    </section>
+
+    <section class="stats" aria-label="Ringkasan bisnis">
+      <article class="stat">
+        <div class="stat-top"><span>Total Produk</span><span class="stat-icon">▦</span></div>
+        <div class="stat-value" id="totalProducts">0</div>
+        <div class="stat-foot">Jenis produk terdaftar</div>
+      </article>
+      <article class="stat">
+        <div class="stat-top"><span>Total Stok</span><span class="stat-icon">▤</span></div>
+        <div class="stat-value" id="totalStock">0</div>
+        <div class="stat-foot">Unit tersedia</div>
+      </article>
+      <article class="stat">
+        <div class="stat-top"><span>Nilai Persediaan</span><span class="stat-icon">↗</span></div>
+        <div class="stat-value" id="inventoryValue">Rp0</div>
+        <div class="stat-foot">Perkiraan harga jual × stok</div>
+      </article>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Daftar Produk</h2>
+        <div class="search-wrap"><span>⌕</span><input class="search" id="searchInput" type="search" placeholder="Cari nama atau kategori..." aria-label="Cari produk"></div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Produk</th><th>Harga</th><th>Stok</th><th>Aksi</th></tr></thead>
+          <tbody id="productRows"></tbody>
+        </table>
+        <div class="empty" id="emptyState">
+          <div class="empty-icon">📦</div>
+          <strong>Belum ada produk</strong>
+          <span>Tambahkan produk pertamamu untuk mulai mengelola inventaris.</span>
+        </div>
+      </div>
+    </section>
+    <p class="footer-note">Data tersimpan di browser perangkat ini melalui localStorage.</p>
+  </main>
+</div>
+
+<div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <form class="modal" id="productForm">
+    <div class="modal-head"><h2 id="modalTitle">Tambah Produk</h2><button class="close-btn" id="closeBtn" type="button" aria-label="Tutup">×</button></div>
+    <div class="field">
+      <label for="productName">Nama produk *</label>
+      <input id="productName" name="productName" type="text" maxlength="80" placeholder="Contoh: Kaos Polos" required>
+    </div>
+    <div class="field">
+      <label for="productCategory">Kategori</label>
+      <input id="productCategory" name="productCategory" type="text" maxlength="50" placeholder="Contoh: Pakaian">
+    </div>
+    <div class="form-grid">
+      <div class="field">
+        <label for="productPrice">Harga (Rp) *</label>
+        <input id="productPrice" name="productPrice" type="number" min="0" step="1" inputmode="numeric" placeholder="50000" required>
+      </div>
+      <div class="field">
+        <label for="productStock">Stok *</label>
+        <input id="productStock" name="productStock" type="number" min="0" step="1" inputmode="numeric" placeholder="10" required>
+      </div>
+    </div>
+    <small style="color:#758096">Harga dan stok harus berupa angka nol atau lebih. Stok menggunakan bilangan bulat.</small>
+    <div class="modal-actions">
+      <button class="btn btn-light" id="cancelBtn" type="button">Batal</button>
+      <button class="btn btn-primary" type="submit" id="saveBtn">Simpan Produk</button>
+    </div>
+  </form>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+  "use strict";
+
+  const STORAGE_KEY = "bisnisku_products_v1";
+  const els = {
+    rows: document.getElementById("productRows"),
+    empty: document.getElementById("emptyState"),
+    search: document.getElementById("searchInput"),
+    modal: document.getElementById("modalBackdrop"),
+    form: document.getElementById("productForm"),
+    title: document.getElementById("modalTitle"),
+    name: document.getElementById("productName"),
+    category: document.getElementById("productCategory"),
+    price: document.getElementById("productPrice"),
+    stock: document.getElementById("productStock"),
+    toast: document.getElementById("toast")
+  };
+
+  let products = loadProducts();
+  let editingId = null;
+  let toastTimer = null;
+
+  function loadProducts() {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (!saved) return [];
+      const parsed = JSON.parse(saved);
+      if (!Array.isArray(parsed)) return [];
+      return parsed.filter(p =>
+        p && typeof p.id === "string" &&
+        typeof p.name === "string" &&
+        Number.isFinite(Number(p.price)) && Number(p.price) >= 0 &&
+        Number.isInteger(Number(p.stock)) && Number(p.stock) >= 0
+      ).map(p => ({
+        id: p.id, name: p.name, category: typeof p.category === "string" ? p.category : "",
+        price: Number(p.price), stock: Number(p.stock)
+      }));
+    } catch (error) {
+      console.error("Gagal membaca data BisnisKu:", error);
+      return [];
+    }
+  }
+
+  function saveProducts() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
+      return true;
+    } catch (error) {
+      console.error("Gagal menyimpan data BisnisKu:", error);
+      showToast("Penyimpanan gagal. Periksa ruang penyimpanan browser.");
+      return false;
+    }
+  }
+
+  function formatRupiah(value) {
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency", currency: "IDR", maximumFractionDigits: 0
+    }).format(value);
+  }
+
+  function makeId() {
+    if (window.crypto && typeof window.crypto.randomUUID === "function") {
+      return window.crypto.randomUUID();
+    }
+    return "p-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 9);
+  }
+
+  function showToast(message) {
+    els.toast.textContent = message;
+    els.toast.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => els.toast.classList.remove("show"), 2600);
+  }
+
+  function render() {
+    const keyword = els.search.value.trim().toLocaleLowerCase("id-ID");
+    const filtered = products.filter(p =>
+      p.name.toLocaleLowerCase("id-ID").includes(keyword) ||
+      p.category.toLocaleLowerCase("id-ID").includes(keyword)
+    );
+
+    document.getElementById("totalProducts").textContent = products.length.toLocaleString("id-ID");
+    document.getElementById("totalStock").textContent = products.reduce((sum, p) => sum + p.stock, 0).toLocaleString("id-ID");
+    document.getElementById("inventoryValue").textContent = formatRupiah(
+      products.reduce((sum, p) => sum + p.price * p.stock, 0)
+    );
+
+    els.rows.replaceChildren();
+    els.empty.style.display = filtered.length ? "none" : "block";
+    if (!filtered.length) {
+      els.empty.querySelector("strong").textContent = products.length ? "Produk tidak ditemukan" : "Belum ada produk";
+      els.empty.querySelector("span").textContent = products.length
+        ? "Coba kata kunci lain."
+        : "Tambahkan produk pertamamu untuk mulai mengelola inventaris.";
+      return;
+    }
+
+    filtered.forEach(product => {
+      const tr = document.createElement("tr");
+      const productCell = document.createElement("td");
+      const name = document.createElement("div");
+      name.className = "product-name";
+      name.textContent = product.name;
+      const category = document.createElement("div");
+      category.className = "product-category";
+      category.textContent = product.category || "Tanpa kategori";
+      productCell.append(name, category);
+
+      const priceCell = document.createElement("td");
+      priceCell.className = "price";
+      priceCell.textContent = formatRupiah(product.price);
+
+      const stockCell = document.createElement("td");
+      const stockBadge = document.createElement("span");
+      stockBadge.className = "stock" + (product.stock === 0 ? " empty" : product.stock <= 5 ? " low" : "");
+      stockBadge.textContent = product.stock.toLocaleString("id-ID") + " unit";
+      stockCell.append(stockBadge);
+
+      const actionCell = document.createElement("td");
+      const actionWrap = document.createElement("div");
+      actionWrap.className = "actions";
+      const editButton = document.createElement("button");
+      editButton.type = "button";
+      editButton.className = "icon-btn";
+      editButton.textContent = "✎";
+      editButton.title = "Edit produk";
+      editButton.setAttribute("aria-label", "Edit " + product.name);
+      editButton.addEventListener("click", () => openModal(product.id));
+      const deleteButton = document.createElement("button");
+      deleteButton.type = "button";
+      deleteButton.className = "icon-btn delete";
+      deleteButton.textContent = "⌫";
+      deleteButton.title = "Hapus produk";
+      deleteButton.setAttribute("aria-label", "Hapus " + product.name);
+      deleteButton.addEventListener("click", () => deleteProduct(product.id));
+      actionWrap.append(editButton, deleteButton);
+      actionCell.append(actionWrap);
+
+      tr.append(productCell, priceCell, stockCell, actionCell);
+      els.rows.append(tr);
+    });
+  }
+
+  function openModal(id = null) {
+    editingId = id;
+    els.form.reset();
+    if (id) {
+      const product = products.find(p => p.id === id);
+      if (!product) return;
+      els.title.textContent = "Edit Produk";
+      els.name.value = product.name;
+      els.category.value = product.category;
+      els.price.value = product.price;
+      els.stock.value = product.stock;
+      document.getElementById("saveBtn").textContent = "Simpan Perubahan";
+    } else {
+      els.title.textContent = "Tambah Produk";
+      document.getElementById("saveBtn").textContent = "Simpan Produk";
+    }
+    els.modal.classList.add("show");
+    setTimeout(() => els.name.focus(), 50);
+  }
+
+  function closeModal() {
+    els.modal.classList.remove("show");
+    editingId = null;
+    els.form.reset();
+  }
+
+  function deleteProduct(id) {
+    const product = products.find(p => p.id === id);
+    if (!product) return;
+    if (!window.confirm('Hapus produk "' + product.name + '"? Tindakan ini tidak bisa dibatalkan.')) return;
+    const previous = products;
+    products = products.filter(p => p.id !== id);
+    if (!saveProducts()) { products = previous; return; }
+    render();
+    showToast("Produk berhasil dihapus.");
+  }
+
+  document.getElementById("addBtn").addEventListener("click", () => openModal());
+  document.getElementById("closeBtn").addEventListener("click", closeModal);
+  document.getElementById("cancelBtn").addEventListener("click", closeModal);
+  els.search.addEventListener("input", render);
+
+  els.modal.addEventListener("click", event => {
+    if (event.target === els.modal) closeModal();
+  });
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && els.modal.classList.contains("show")) closeModal();
+  });
+
+  els.form.addEventListener("submit", event => {
+    event.preventDefault();
+    const name = els.name.value.trim();
+    const category = els.category.value.trim();
+    const price = Number(els.price.value);
+    const stock = Number(els.stock.value);
+
+    if (!name) { showToast("Nama produk wajib diisi."); els.name.focus(); return; }
+    if (els.price.value === "" || !Number.isFinite(price) || price < 0) {
+      showToast("Masukkan harga yang valid."); els.price.focus(); return;
+    }
+    if (els.stock.value === "" || !Number.isSafeInteger(stock) || stock < 0) {
+      showToast("Stok harus bilangan bulat nol atau lebih."); els.stock.focus(); return;
+    }
+
+    const wasEditing = Boolean(editingId);
+    const previous = products;
+    if (editingId) {
+      const index = products.findIndex(p => p.id === editingId);
+      if (index < 0) { showToast("Produk tidak ditemukan. Muat ulang halaman."); closeModal(); return; }
+      products = products.map(p => p.id === editingId ? { ...p, name, category, price, stock } : p);
+    } else {
+      products = [...products, { id: makeId(), name, category, price, stock }];
+    }
+
+    if (!saveProducts()) { products = previous; return; }
+    render();
+    closeModal();
+    showToast(wasEditing ? "Perubahan produk tersimpan." : "Produk berhasil ditambahkan.");
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
